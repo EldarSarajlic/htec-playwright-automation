@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "npx playwright test userManagement-users-page.spec.ts --ui"
-  },
+  "scripts": {},
   "keywords": [],
   "author": "",
   "license": "ISC",
