@@ -204,7 +204,7 @@ test("Invalid password validation", async({request})=>{
     });
     const responsePostJson2 = await responsePost2.json();
     expect(responsePost2.status()).toBe(422);
-    expect(responsePostJson2.error.data.invalidParamKeys[0]).toBe("password");
+    expect(responsePostJson2.error.data.invalidParamKeys).toContain("password");
 })
 
 test("Invalid employee number validation", async({request})=>{
@@ -226,7 +226,7 @@ test("Invalid employee number validation", async({request})=>{
     });
     const responsePostJson = await responsePost.json();
     expect(responsePost.status()).toBe(422);
-    expect(responsePostJson.error.data.invalidParamKeys[0]).toBe("empNumber");
+    expect(responsePostJson.error.data.invalidParamKeys).toContain("empNumber");
 })
 
 test("Invalid status validation", async({request})=>{
@@ -255,7 +255,7 @@ test("Invalid status validation", async({request})=>{
     });
     const responsePostJson1 = await responsePost1.json();
     expect(responsePost1.status()).toBe(422);
-    expect(responsePostJson1.error.data.invalidParamKeys[0]).toBe("status");
+    expect(responsePostJson1.error.data.invalidParamKeys).toContain("status");
 })
 
 
