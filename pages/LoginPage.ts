@@ -1,5 +1,4 @@
 import {Page, expect, Locator} from '@playwright/test';
-import { error } from 'node:console';
 import { BasePage } from './BasePage';
 
 export class LoginPage extends BasePage{
@@ -11,7 +10,7 @@ export class LoginPage extends BasePage{
     private readonly loginHeader: Locator;
     private readonly resetPasswordHeader: Locator;
     private readonly validationError: Locator;
-    private readonly requiedError: Locator;
+    private readonly requiredError: Locator;
     private readonly forgotYourPasswordLink: Locator;
 
     constructor(page: Page){
@@ -24,14 +23,16 @@ export class LoginPage extends BasePage{
         this.loginHeader = page.getByRole('heading', { name: 'Login' });
         this.resetPasswordHeader = page.getByRole('heading', { name: 'Reset Password' });
         this.validationError = page.getByText('Invalid credentials');
-        this.requiedError =  page.getByText('Required');
+        this.requiredError =  page.getByText('Required');
         this.forgotYourPasswordLink = page.getByText('Forgot your password?');
     }
 
-    override async navigate(url: string){
-        await this.page.goto(url);
+    async goToLoginPage() {
+    await this.navigate(process.env.LOGIN_URL!);
+}
 
-        await this.validateElementPresence(this.loginHeader);
+    async verifyLoginHeader() {
+        await expect(this.loginHeader).toBeVisible();
     }
 
     async enterUsername(username: string){
@@ -42,34 +43,31 @@ export class LoginPage extends BasePage{
         await this.passwordInput.fill(password);
     }
 
-    async clickLogin(){
-        await this.loginButton.click();
+    async clickLogin() {
+    await this.loginButton.click();
+}
 
-        await Promise.race([
-            this.dashboardHeader.waitFor(),
-            this.validationError.waitFor(),     
-            this.requiedError.first().waitFor() 
-        ]);
+    async verifySuccessfulLogin() {
+        await this.dashboardHeader.waitFor();
+        await this.navHelper.validateUrlPartition('dashboard');
+    }
 
-        if(await this.dashboardHeader.isVisible()){
-            await this.validateUrlPartition("dashboard")
-        }
-        else if (await this.requiedError.first().isVisible()) {
-            await expect(this.requiedError).toHaveCount(2);
-        }
-         else {
-            await expect(this.validationError).toBeVisible();
-        }
+    async verifyInvalidCredentialsError() {
+        await expect(this.validationError).toBeVisible({timeout:10000});
+    }
+
+    async verifyRequiredFieldErrors() {
+        await expect(this.requiredError).toHaveCount(2);
     }
 
     async clickForgotYourPassword(){
         await this.forgotYourPasswordLink.click();
-        await this.validateUrlPartition("requestPasswordResetCode")
-        await this.validateElementPresence(this.resetPasswordHeader);
+        await this.navHelper.validateUrlPartition('requestPasswordResetCode');
+        await expect(this.resetPasswordHeader).toBeVisible({timeout:10000});
     }
 
     async LoginUser(username:string, password:string){
-        this.navigate(process.env.LOGIN_URL!);
+        await this.goToLoginPage();
         this.enterUsername(username);
         this.enterPassword(password);
         this.clickLogin();

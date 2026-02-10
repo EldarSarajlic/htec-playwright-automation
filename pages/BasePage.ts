@@ -1,43 +1,31 @@
 import {test, expect, Page, Locator} from '@playwright/test'
+import { NavigationHelper } from '../helpers/navigationHelper';
 
 export class BasePage{
     readonly page: Page;
-
+    protected navHelper: NavigationHelper;
 
     constructor(page:Page){
         this.page = page;
+        this.navHelper = new NavigationHelper(page);
     }
 
      //#region Validations & Assesrtions
     async validateInput(input: Locator, expectedInput: string){
         await expect(input).toHaveValue(expectedInput);
     }
-    async validateElementPresence(element?: Locator, text?:string){
-        if(element){
-            await expect(element).toBeVisible();
-        }
-        else if(text){
-            await expect(this.page.getByText(text)).toBeVisible();
-        }
-        
-        else throw Error("No parameters were provided for validateElemetPresence function!");
-        
-    }
+    async validateByText(text: string){
+    await expect(this.page.getByText(text)).toBeVisible();
+}
     async validateTextboxByName(textbox: string){
         await expect(this.page.getByRole('textbox', {name: textbox})).toBeEditable();
     }
     async validateButtonByName(textbox: string){
         await expect(this.page.getByRole('button', {name: textbox})).toBeEnabled();
     }
-    async validateUrlPartition(urlPart: string){
-         await expect(this.page).toHaveURL(new RegExp(urlPart));
-    }
     //#endregion
 
-    //#region Action methods shared across pages
-    //#region Page actions
-    async navigate(url: string){
-        await this.page.goto(url);
-    }
-    //#endregion
+    async navigate(url: string) {
+    await this.navHelper.navigate(url);
+}
 }
