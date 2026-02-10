@@ -68,9 +68,9 @@ export class LoginPage extends BasePage{
 
     async LoginUser(username:string, password:string){
         await this.goToLoginPage();
-        this.enterUsername(username);
-        this.enterPassword(password);
-        this.clickLogin();
+        await this.enterUsername(username);
+        await this.enterPassword(password);
+        await this.clickLogin();
     }
     //#endregion
 }
