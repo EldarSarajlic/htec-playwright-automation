@@ -1,5 +1,6 @@
 import {Page, expect, Locator} from '@playwright/test';
 import { BasePage } from './BasePage';
+import { DASHBOARD_WIDGETS } from '../constants/dashboard-constants';
 
 export class DashboardPage extends BasePage{
     readonly page: Page;
@@ -21,22 +22,13 @@ export class DashboardPage extends BasePage{
     }
 
     async verifyDashboardWidgets() {
-    const expectedWidgets = [
-        'Time at Work',
-        'My Actions',
-        'Quick Launch',
-        'Buzz Latest Posts',
-        'Employees on Leave Today',
-        'Employee Distribution by Sub Unit',
-        'Employee Distribution by Location'
-    ];
-
     const widgets = await this.page.locator('.orangehrm-dashboard-widget-header').allTextContents();
-    for (const widget of expectedWidgets) {
-        expect(widgets).toContain(widget);
+  
+    for (const widget of DASHBOARD_WIDGETS) {
+         expect(widgets).toContain(widget);
+        }
     }
-    }
-      
+   
 }
 
    
