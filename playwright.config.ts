@@ -12,11 +12,7 @@ import { defineConfig, devices } from '@playwright/test';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  timeout: 60000, // Individual test timeout (60s)
-  globalTimeout: 600000, // Entire suite must finish in 10 mins
-  expect: {
-    timeout: 10000, // Assertions wait 10s
-  },
+  timeout: 60000,
   testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -28,6 +24,12 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
+
+  globalSetup: require.resolve('./global-setup'),
+
+  //When we have to delete data created from globalSetup, uncomment the line below
+  //globalTeardown: require.resolve('./global-teardown'),
+
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
@@ -40,10 +42,26 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+    
+    // Admin tests - uses admin auth from global setup
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'authenticated',
+      testDir: './tests/OrangeHRM - Automation tasks/authenticated', 
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'playwright/.auth/admin.json', 
+      },
     },
+
+    // No-auth tests (login tests, API tests)
+    {
+      name: 'unauthenticated',
+      testDir: './tests/OrangeHRM - Automation tasks/unauthenticated', 
+      use: {
+        ...devices['Desktop Chrome'],
+      },
+    },
+    
 
     // {
     //   name: 'firefox',
