@@ -23,8 +23,18 @@ export class BasePage{
     async validateButtonByName(textbox: string){
         await expect(this.page.getByRole('button', {name: textbox})).toBeEnabled();
     }
-    //#endregion
 
+    async validateDropdownsAndSubItems(tabs: Record<string, string[]>){
+        for (const [tabName, expectedSubItems] of Object.entries(tabs)) {
+        const tab = this.page.getByRole('listitem').filter({hasText:tabName});
+        await expect(tab).toHaveText(tabName);
+        await tab.click();
+        const dropdownItems = this.page.getByRole('menuitem');
+        await expect(dropdownItems).toHaveText(expectedSubItems);
+        }
+    }
+    //#endregion
+    
     async navigate(url: string) {
     await this.navHelper.navigate(url);
 }
