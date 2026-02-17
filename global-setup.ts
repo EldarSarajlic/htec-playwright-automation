@@ -11,7 +11,7 @@ const AUTH_FILE_PATH = 'playwright/.auth/admin.json';
 async function globalSetup(config: FullConfig) {
   
   //Reuse auth session
-  if (isAuthValid(AUTH_FILE_PATH)) {
+  if (await isAuthValid(AUTH_FILE_PATH)) {
     console.log('Skipping login - reusing valid auth');
     return;
   }
