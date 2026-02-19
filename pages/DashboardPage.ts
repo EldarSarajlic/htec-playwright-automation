@@ -16,7 +16,7 @@ export class DashboardPage extends BasePage{
         await this.navigate(process.env.DASHBOARD_URL!);
         await this.navHelper.validateUrlPartition('dashboard');
     }
-     async verifyDashboardItemIsActive() {
+    async verifyDashboardItemIsActive() {
        await expect(this.dashboardItem).toBeVisible();
        await expect(this.dashboardItem).toContainClass('active');
     }

@@ -1,8 +1,9 @@
 import { existsSync, unlinkSync, readFileSync } from 'fs';
+import { request } from '@playwright/test';
 
-export function isAuthValid(authFilePath: string): boolean { 
+export async function isAuthValid(authFilePath: string): Promise<boolean> { 
   if (!existsSync(authFilePath)) {
-    console.log('ℹNo auth state found');
+    console.log('No auth state found');
     return false;
   }
 
@@ -15,25 +16,26 @@ export function isAuthValid(authFilePath: string): boolean {
       return false;
     }
 
-    // Check if ANY cookie is expired
-    const now = Date.now() / 1000; // Current time in seconds 
+    console.log('Validating session with API call...');
+    
+    const apiContext = await request.newContext({ storageState: authFilePath });
+    const response = await apiContext.get(process.env.USERMANAGEMENT_URL!);
+    await apiContext.dispose();
 
-    const hasExpiredCookie = authData.cookies.some((cookie: any) => {
-      return cookie.expires !== -1              // -1 means session cookie
-        && cookie.expires < now;                
-    });
+    const finalUrl = response.url();
+    const isValid = !finalUrl.includes('/auth/login');
 
-    if (hasExpiredCookie) {
-      console.log('Cookies expired - deleting');
+    if (!isValid) {
+      console.log('Session expired (redirected to login) - deleting');
       unlinkSync(authFilePath);
       return false;
     }
 
-    console.log('Cookies valid - reusing auth');
+    console.log('Session valid - reusing auth');
     return true;
 
-  } catch {
-    console.log('Auth file corrupted - deleting');
+  } catch (error) {
+    console.log('Session validation failed - deleting');
     unlinkSync(authFilePath);
     return false;
   }
