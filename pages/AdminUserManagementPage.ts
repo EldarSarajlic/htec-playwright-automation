@@ -14,6 +14,7 @@ export class AdminUserManagementPage extends BasePage{
     private readonly addButton:Locator;
     private readonly tempTextSearching: Locator;
     private readonly tempTextSelect: Locator;
+    private readonly systemUsersHeader: Locator;
 
     private cachedUsername?:string;
     private cachedEmployeeName?:string;
@@ -33,6 +34,7 @@ export class AdminUserManagementPage extends BasePage{
         this.addButton = page.getByRole('button', { name: 'Add'});
         this.tempTextSearching = page.getByRole('option', { name: 'Searching....' });
         this.tempTextSelect = page.getByRole('option', { name: '-- Select --' })
+        this.systemUsersHeader = page.getByRole('heading', { name: 'System Users' });
     }
 
     async goToUserManagementPage() {
@@ -43,6 +45,10 @@ export class AdminUserManagementPage extends BasePage{
     async verifySidebarItemIsActive() {
        await expect(this.adminSidebarItem).toBeVisible();
        await expect(this.adminSidebarItem).toContainClass('active');
+    }
+
+    async verifiyHeaderVisibility(){
+        await expect(this.systemUsersHeader).toBeVisible({timeout:30000});
     }
     
     async verifyAdminTabs(){
@@ -117,9 +123,16 @@ export class AdminUserManagementPage extends BasePage{
         return this.cachedUsername;
     }
 
-    async fillUsernameFilter(){
+    async fillUsernameFilter(username?:string){
+        if(username){
+        await this.waitForSpinnerToDisappear();
+        await this.userNameFilter.fill(username);
+        }
+        else{
         await this.waitForSpinnerToDisappear();
         await this.userNameFilter.fill(await this.getValidUsername());
+        }
+        
     }
 
     async verifyAndResetUsernameFilter(){

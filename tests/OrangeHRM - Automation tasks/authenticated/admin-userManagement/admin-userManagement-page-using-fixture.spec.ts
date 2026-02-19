@@ -90,10 +90,10 @@ test("New user is succesfuly created and persists in the user list", async({page
     })
 
     await pages.adminAddUserPage.clickSave();
-    await pages.adminUserManagementPage.verifySidebarItemIsActive();
+    await pages.adminUserManagementPage.verifiyHeaderVisibility();
     
     await test.step("Search by username", async() => {
-        await pages.adminUserManagementPage.fillUsernameFilter();
+        await pages.adminUserManagementPage.fillUsernameFilter(await pages.adminAddUserPage.getUsername());
         await pages.adminUserManagementPage.clickSearchButton();
         await pages.adminUserManagementPage.verifyAndResetUsernameFilter();
     });

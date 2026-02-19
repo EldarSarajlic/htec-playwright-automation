@@ -1,14 +1,13 @@
 import {Page, expect, Locator} from '@playwright/test';
 import { BasePage } from './BasePage';
+import { DataHelper } from '../helpers/dataHelper';
 
-const USER_ROLE = "Admin";
-const STATUS  = "Enabled";
-const VALID_PASSWORD = "Test_Password_User_12345"
 let USERNAME = "";
 let EMPLOYEE_NAME = "";
 
 export class AdminAddUserPage extends BasePage {
     readonly page: Page;
+    protected dataHelper: DataHelper;
     private readonly addUserPageHeader: Locator;
     private readonly userRoleDropdown: Locator;
     private readonly statusDropdown: Locator;
@@ -21,6 +20,7 @@ export class AdminAddUserPage extends BasePage {
     constructor(page: Page){
         super(page);
         this.page = page;
+        this.dataHelper = new DataHelper();
         this.addUserPageHeader = page.getByRole('heading', { name: 'Add User' })
         this.userRoleDropdown = page.locator('div').filter({ hasText: /^User Role*/ }).nth(3).locator('div').nth(4);
         this.statusDropdown = page.locator('div').filter({ hasText: /^Status*/ }).nth(1).locator('div').nth(4)
@@ -43,7 +43,7 @@ export class AdminAddUserPage extends BasePage {
     async chooseUserRole(){
         await this.userRoleDropdown.click();
         for(let role of await this.getDropdownOptions()){
-            if((await role.innerText()).includes(USER_ROLE)){
+            if((await role.innerText()).includes(process.env.USER_ROLE!)){
                 await role.click();
                 break;
             }
@@ -51,7 +51,7 @@ export class AdminAddUserPage extends BasePage {
     }
 
     async verifyUserRole(){
-        expect(await this.userRoleDropdown.innerText()).toBe(USER_ROLE);
+        expect(await this.userRoleDropdown.innerText()).toBe(process.env.USER_ROLE!);
     }
     //#endregion
 
@@ -59,7 +59,7 @@ export class AdminAddUserPage extends BasePage {
     async chooseStatus(){
         await this.statusDropdown.click();
         for(let status of await this.getDropdownOptions()){
-            if((await status.innerText()).includes(STATUS)){
+            if((await status.innerText()).includes(process.env.STATUS!)){
                 await status.click();
                 break;
             }
@@ -67,21 +67,19 @@ export class AdminAddUserPage extends BasePage {
     }
 
     async verifyStatus(){
-        expect(await this.statusDropdown.innerText()).toBe(STATUS);
+        expect(await this.statusDropdown.innerText()).toBe(process.env.STATUS);
     }
     //#endregion
 
     //#region Username input
-    generateValidUsername(): string{
-        let date = new Date();
-        let dateTime:string = date.toLocaleString();
-        let VALID_USERNAME = `qa_user_Username<${dateTime}>`;
-        USERNAME = VALID_USERNAME;
-        return VALID_USERNAME;
-    }
 
     async enterValidUsername(){
-        await this.usernameInput.fill(this. generateValidUsername());
+        USERNAME = this.dataHelper.generateValidUsername();
+        await this.usernameInput.fill(USERNAME);
+    }
+
+    async getUsername(){
+        return USERNAME;
     }
 
     async verifyUsernameInput(){
@@ -102,8 +100,8 @@ export class AdminAddUserPage extends BasePage {
 
     //#region Password input
     async enterValidPassword(){
-        await this.passwordField.fill(VALID_PASSWORD);
-        await this.confirmPasswordField.fill(VALID_PASSWORD);
+        await this.passwordField.fill(process.env.VALID_PASSWORD!);
+        await this.confirmPasswordField.fill(process.env.VALID_PASSWORD!);
     }
     //#endregion
 
